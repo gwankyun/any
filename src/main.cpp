@@ -8,16 +8,24 @@
 
 int main(int argc, char* argv[])
 {
-    any ai = make_any<int>(1);
-    int* i = any_cast<int>(&ai);
-    std::string* s = any_cast<std::string>(&ai);
-    if (i != NULL)
+    auto ai = make_any<int>(1);
+    auto i = any_cast<int>(&ai);
+    auto s = any_cast<std::string>(&ai);
+    if (i != nullptr)
     {
         std::cout << *i << std::endl;
     }
-    if (s != NULL)
+    if (s != nullptr)
     {
         std::cout << *s << std::endl;
     }
+    auto ai2(ai);
+    auto i2 = any_cast<int>(&ai2);
+    if (i2 != nullptr)
+    {
+        std::cout << *i2 << std::endl;
+    }
+    any a3;
+    std::cout << a3.has_value() << std::endl;
     return 0;
 }

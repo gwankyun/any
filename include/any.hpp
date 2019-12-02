@@ -1,8 +1,10 @@
 #pragma once
 #include <cstddef>
 #include <typeinfo>
+#include <memory>
+#include <utility>
 
-#define NOEXCEPT
+#define NOEXCEPT noexcept
 
 class any;
 
@@ -60,7 +62,7 @@ public:
     {
     }
 
-    char const* what() const
+    char const* what() const NOEXCEPT
     {
         return "bad_any_cast";
     }
@@ -72,11 +74,15 @@ private:
 class any
 {
 public:
-    any() NOEXCEPT : b(NULL)
+    any() NOEXCEPT
     {
     }
 
-    any(Any::base* b_) : b(b_)
+    any(const any& other) : b(other.b)
+    {
+    }
+
+    any(std::shared_ptr<Any::base> b_) : b(b_)
     {
     }
 
@@ -87,16 +93,12 @@ public:
 
     void reset() NOEXCEPT
     {
-        if (b != NULL)
-        {
-            delete b;
-            b = NULL;
-        }
+        b.reset();
     }
 
     bool has_value() const NOEXCEPT
     {
-        return b != NULL;
+        return bool(b);
     }
 
     any& operator=(any& other)
@@ -104,14 +106,14 @@ public:
         if (this != &other)
         {
             b = other.b;
-            other.b = NULL;
+            //other.b = NULL;
         }
         return *this;
     }
 
     void swap(any& other)
     {
-        Any::base* temp = b;
+        auto temp = b;
         b = other.b;
         other.b = temp;
     }
@@ -132,27 +134,30 @@ public:
     friend T* any_cast(any* operand) NOEXCEPT;
 
 private:
-    Any::base* b;
+    //Any::base* b;
+    std::shared_ptr<Any::base> b;
 };
 
 template<typename T>
 any make_any(const T& value) NOEXCEPT
 {
-    Any::base* b = new Any::derived<T>(value);
+    //Any::base* b = new Any::derived<T>(value);
+    auto b = std::make_shared<Any::derived<T>>(value);
     return any(b);
 }
 
 template<typename T>
 T* any_cast(any* operand) NOEXCEPT
 {
-    Any::derived<T>* d = dynamic_cast<Any::derived<T>*>(operand->b);
-    if (d != NULL)
+    //Any::derived<T>* d = dynamic_cast<Any::derived<T>*>(operand->b);
+    auto d = std::dynamic_pointer_cast<Any::derived<T>>(operand->b);
+    if (d)
     {
         return &(d->value);
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -166,7 +171,7 @@ template<typename T>
 T any_cast(any& operand)
 {
     Any::derived<T>* d = any_cast(&operand);
-    if (d != NULL)
+    if (d != nullptr)
     {
         return d->value;
     }
