@@ -6,40 +6,38 @@
 #include <string>
 #include "any.hpp";
 
-int main(int argc, char* argv[])
+template<typename T>
+void test(const std::string& str, const any& value)
 {
-    auto ai = make_any<int>(1);
-    auto i = any_cast<int>(&ai);
-    auto s = any_cast<std::string>(&ai);
+    auto i = any_cast<T>(&value);
     if (i != nullptr)
     {
-        std::cout << *i << std::endl;
+        std::cout << str << ": " << *i << std::endl;
     }
-    if (s != nullptr)
+    else
     {
-        std::cout << *s << std::endl;
+        std::cout << str << ": " << "null" << std::endl;
     }
-    auto ai2(ai);
-    auto i2 = any_cast<int>(&ai2);
-    if (i2 != nullptr)
-    {
-        std::cout << *i2 << std::endl;
-    }
+}
+
+int main(int argc, char* argv[])
+{
+    auto a1 = make_any<int>(1);
+    test<int>("a1", a1);
+
+    test<std::string>("a1", a1);
+
+    auto a2(a1);
+    test<int>("a2", a2);
+
     any a3;
-    std::cout << a3.has_value() << std::endl;
+    std::cout << "a3: " << a3.has_value() << std::endl;
+
     any a4(4);
-    auto i4 = any_cast<int>(&a4);
-    if (i4 != nullptr)
-    {
-        std::cout << *i4 << std::endl;
-    }
+    test<int>("a4", a4);
 
     any a5;
     a5 = 5;
-    auto i5 = any_cast<int>(&a5);
-    if (i5 != nullptr)
-    {
-        std::cout << *i5 << std::endl;
-    }
+    test<int>("a5", a5);
     return 0;
 }
