@@ -4,8 +4,29 @@
 
 #define NOEXCEPT
 
-namespace Any
+class bad_any_cast : public std::bad_cast
 {
+public:
+    bad_any_cast()
+    {
+    }
+
+    ~bad_any_cast()
+    {
+    }
+
+    char const* what() const NOEXCEPT
+    {
+        return "bad_any_cast";
+    }
+
+private:
+
+};
+
+class any
+{
+public:
     class base
     {
     public:
@@ -52,31 +73,7 @@ namespace Any
     private:
 
     };
-}
 
-class bad_any_cast : public std::bad_cast
-{
-public:
-    bad_any_cast()
-    {
-    }
-
-    ~bad_any_cast()
-    {
-    }
-
-    char const* what() const NOEXCEPT
-    {
-        return "bad_any_cast";
-    }
-
-private:
-
-};
-
-class any
-{
-public:
     any() NOEXCEPT : b(NULL)
     {
     }
@@ -86,7 +83,7 @@ public:
     }
 
     template<typename T>
-    explicit any(const T& value) : b(new Any::derived<T>(value))
+    explicit any(const T& value) : b(new derived<T>(value))
     {
     }
 
@@ -95,7 +92,7 @@ public:
     {
         reset();
         *this = value;
-        return dynamic_cast<Any::derived<T>*>(b)->value;
+        return dynamic_cast<derived<T>*>(b)->value;
     }
 
     ~any()
@@ -130,7 +127,7 @@ public:
     any& operator=(const T& rhs)
     {
         reset();
-        b = new Any::derived<T>(rhs);
+        b = new derived<T>(rhs);
         return *this;
     }
 
@@ -160,13 +157,13 @@ public:
     friend any make_any(const T& value) NOEXCEPT;
 
 private:
-    Any::base* b;
+    any::base* b;
 };
 
 template<typename T>
 any make_any(const T& value) NOEXCEPT
 {
-    Any::base* b = new Any::derived<T>(value);
+    any::base* b = new any::derived<T>(value);
     any a;
     a.b = b;
     return a;
@@ -175,7 +172,7 @@ any make_any(const T& value) NOEXCEPT
 template<typename T>
 T* any_cast(any* operand) NOEXCEPT
 {
-    Any::derived<T>* d = dynamic_cast<Any::derived<T>*>(operand->b);
+    any::derived<T>* d = dynamic_cast<any::derived<T>*>(operand->b);
     if (d != NULL)
     {
         return &(d->value);
@@ -195,7 +192,7 @@ const T* any_cast(const any* operand) NOEXCEPT
 template<typename T>
 T any_cast(any& operand)
 {
-    Any::derived<T>* d = any_cast(&operand);
+    any::derived<T>* d = any_cast(&operand);
     if (d != NULL)
     {
         return d->value;
