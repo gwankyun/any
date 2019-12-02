@@ -1,12 +1,8 @@
 #pragma once
 #include <cstddef>
 #include <typeinfo>
-#include <memory>
-#include <utility>
 
-#define NOEXCEPT noexcept
-
-class any;
+#define NOEXCEPT
 
 namespace Any
 {
