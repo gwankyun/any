@@ -90,6 +90,14 @@ public:
     {
     }
 
+    template<typename T>
+    T& emplace(const T& value)
+    {
+        reset();
+        *this = value;
+        return dynamic_cast<Any::derived<T>*>(b)->value;
+    }
+
     ~any()
     {
         reset();

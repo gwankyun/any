@@ -43,5 +43,11 @@ int main(int argc, char* argv[])
     any a6;
     a6 = a5;
     test<int>("a6", a6);
+
+    any a7;
+    a7 = 6;
+    auto i7 = a7.emplace(7);
+    test<int>("a7", a7);
+    std::cout << "i7: " << i7 << std::endl;
     return 0;
 }
