@@ -54,6 +54,12 @@ public:
         {
         }
 
+        template<typename T1, typename T2>
+        derived(const T1& t1, const T2& t2)
+            :value(t1, t2)
+        {
+        }
+
         ~derived()
         {
         }
@@ -163,10 +169,7 @@ private:
 template<typename T>
 any make_any(const T& value) NOEXCEPT
 {
-    any::base* b = new any::derived<T>(value);
-    any a;
-    a.b = b;
-    return a;
+    return any(value);
 }
 
 template<typename T>
