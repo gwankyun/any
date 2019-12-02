@@ -33,5 +33,13 @@ int main(int argc, char* argv[])
     {
         std::cout << *i4 << std::endl;
     }
+
+    any a5;
+    a5 = 5;
+    auto i5 = any_cast<int>(&a5);
+    if (i5 != nullptr)
+    {
+        std::cout << *i5 << std::endl;
+    }
     return 0;
 }

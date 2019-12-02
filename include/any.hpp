@@ -118,6 +118,14 @@ public:
         return *this;
     }
 
+    template<typename T>
+    any& operator=(const T& rhs)
+    {
+        reset();
+        b = new Any::derived<T>(rhs);
+        return *this;
+    }
+
     void swap(any& other)
     {
         auto temp = b;
