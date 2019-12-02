@@ -85,6 +85,11 @@ public:
     {
     }
 
+    template<typename T>
+    explicit any(const T& value) : b(new Any::derived<T>(value))
+    {
+    }
+
     ~any()
     {
         reset();
@@ -101,7 +106,7 @@ public:
 
     bool has_value() const NOEXCEPT
     {
-        return bool(b);
+        return b != NULL;
     }
 
     any& operator=(const any& other)

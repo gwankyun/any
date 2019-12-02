@@ -27,5 +27,11 @@ int main(int argc, char* argv[])
     }
     any a3;
     std::cout << a3.has_value() << std::endl;
+    any a4(4);
+    auto i4 = any_cast<int>(&a4);
+    if (i4 != nullptr)
+    {
+        std::cout << *i4 << std::endl;
+    }
     return 0;
 }
