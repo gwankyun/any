@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
-#include "any.hpp";
+#include "any.hpp"
 
 template<typename T>
 void test(const std::string& str, const any& value)
