@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     test<int>("a2", a2);
 
     any a3;
-    std::cout << "a3: " << a3.has_value() << std::endl;
+    test<int>("a3", a3);
 
     any a4(4);
     test<int>("a4", a4);
@@ -39,5 +39,9 @@ int main(int argc, char* argv[])
     any a5;
     a5 = 5;
     test<int>("a5", a5);
+
+    any a6;
+    a6 = a5;
+    test<int>("a6", a6);
     return 0;
 }
