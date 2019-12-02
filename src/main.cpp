@@ -6,6 +6,45 @@
 #include <string>
 #include "any.hpp"
 
+class Object
+{
+public:
+    Object()
+    {
+    }
+
+    Object(int t1)
+    {
+        data += t1;
+    }
+
+    Object(int t1, int t2)
+    {
+        data += t1;
+        data += t2;
+    }
+
+    ~Object()
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, Object& obj);
+    friend std::ostream& operator<<(std::ostream& os, const Object& obj);
+
+private:
+    int data = 0;
+};
+
+std::ostream& operator<<(std::ostream& os, Object& obj)
+{
+    return os << obj.data;
+}
+
+std::ostream& operator<<(std::ostream& os, const Object& obj)
+{
+    return os << obj.data;
+}
+
 template<typename T>
 void test(const std::string& str, const any& value)
 {
@@ -49,5 +88,15 @@ int main(int argc, char* argv[])
     auto i7 = a7.emplace(7);
     test<int>("a7", a7);
     std::cout << "i7: " << i7 << std::endl;
+    Object obj;
+    std::cout << obj << std::endl;
+
+    auto o1 = make_any<Object>(1);
+    test<Object>("o1", o1);
+
+    auto o2 = make_any<Object>(1, 1);
+    test<Object>("o2", o2);
+    o2.emplace<Object>(1, 2);
+    test<Object>("o2", o2);
     return 0;
 }
