@@ -64,7 +64,7 @@ public:
 
     void reset() NOEXCEPT
     {
-        if (b != NULL)
+        if (has_value())
         {
             delete b;
             b = NULL;
@@ -80,6 +80,7 @@ public:
     {
         if (this != &other)
         {
+            reset();
             b = other.b->clone();
         }
         return *this;
@@ -95,7 +96,7 @@ public:
 
     void swap(any& other)
     {
-        auto temp = b;
+        base* temp = b;
         b = other.b;
         other.b = temp;
     }
