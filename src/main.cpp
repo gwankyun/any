@@ -24,6 +24,13 @@ public:
         data += t2;
     }
 
+    Object(int t1, int t2, int t3)
+    {
+        data += t1;
+        data += t2;
+        data += t3;
+    }
+
     ~Object()
     {
     }
@@ -101,5 +108,8 @@ int main(int argc, char* argv[])
 
     auto o3 = make_any<Object>(1, 2);
     auto io3 = any_cast<Object>(o3);
+
+    auto o4 = make_any<Object>(1, 1, 1);
+    test<Object>("o4", o4);
     return 0;
 }

@@ -150,12 +150,6 @@ private:
         {
         }
 
-        template<typename T1, typename T2>
-        derived(const T1& t1, const T2& t2)
-            :value(t1, t2)
-        {
-        }
-
         ~derived()
         {
         }
@@ -189,6 +183,12 @@ template<typename T, typename T1, typename T2>
 any make_any(const T1& t1, const T2& t2) NOEXCEPT
 {
     return any(T(t1, t2));
+}
+
+template<typename T, typename T1, typename T2, typename T3>
+any make_any(const T1& t1, const T2& t2, const T3& t3) NOEXCEPT
+{
+    return any(T(t1, t2, t3));
 }
 
 template<typename T>
