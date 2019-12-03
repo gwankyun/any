@@ -27,58 +27,6 @@ private:
 class any
 {
 public:
-    class base
-    {
-    public:
-        base() NOEXCEPT
-        {
-        }
-
-        virtual ~base()
-        {
-        }
-
-        virtual const std::type_info& type() const NOEXCEPT = 0;
-
-        virtual base* clone() = 0;
-
-    private:
-
-    };
-
-    template<typename T>
-    class derived : public base
-    {
-    public:
-        derived(const T& value_) : value(value_)
-        {
-        }
-
-        template<typename T1, typename T2>
-        derived(const T1& t1, const T2& t2)
-            :value(t1, t2)
-        {
-        }
-
-        ~derived()
-        {
-        }
-
-        const std::type_info& type() const NOEXCEPT
-        {
-            return typeid(value);
-        }
-
-        base* clone()
-        {
-            return new derived<T>(value);
-        }
-
-        T value;
-
-    private:
-
-    };
 
     any() NOEXCEPT : b(NULL)
     {
@@ -174,7 +122,60 @@ public:
     any make_any(const T1& t1, const T2& t2) NOEXCEPT;
 
 private:
-    any::base* b;
+    class base
+    {
+    public:
+        base() NOEXCEPT
+        {
+        }
+
+        virtual ~base()
+        {
+        }
+
+        virtual const std::type_info& type() const NOEXCEPT = 0;
+
+        virtual base* clone() = 0;
+
+    private:
+
+    };
+
+    template<typename T>
+    class derived : public base
+    {
+    public:
+        derived(const T& value_) : value(value_)
+        {
+        }
+
+        template<typename T1, typename T2>
+        derived(const T1& t1, const T2& t2)
+            :value(t1, t2)
+        {
+        }
+
+        ~derived()
+        {
+        }
+
+        const std::type_info& type() const NOEXCEPT
+        {
+            return typeid(value);
+        }
+
+        base* clone()
+        {
+            return new derived<T>(value);
+        }
+
+        T value;
+
+    private:
+
+    };
+
+    base* b;
 };
 
 template<typename T>
@@ -233,4 +234,3 @@ inline void swap(any& lhs, any& rhs) NOEXCEPT
 {
     lhs.swap(rhs);
 }
-
