@@ -213,10 +213,10 @@ const T* any_cast(const any* operand) NOEXCEPT
 template<typename T>
 T any_cast(any& operand)
 {
-    any::derived<T>* d = any_cast(&operand);
+    T* d = any_cast<T>(&operand);
     if (d != NULL)
     {
-        return d->value;
+        return *d;
     }
     else
     {
@@ -227,7 +227,7 @@ T any_cast(any& operand)
 template<typename T>
 T any_cast(const any& operand)
 {
-    return any_cast(const_cast<any&>(operand));
+    return any_cast<T>(const_cast<any&>(operand));
 }
 
 inline void swap(any& lhs, any& rhs) NOEXCEPT

@@ -98,5 +98,8 @@ int main(int argc, char* argv[])
     test<Object>("o2", o2);
     o2.emplace<Object>(1, 2);
     test<Object>("o2", o2);
+
+    auto o3 = make_any<Object>(1, 2);
+    auto io3 = any_cast<Object>(o3);
     return 0;
 }
