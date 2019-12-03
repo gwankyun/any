@@ -119,9 +119,6 @@ public:
     template<typename T>
     friend any make_any(const T& value) NOEXCEPT;
 
-    template<typename T, typename T1, typename T2>
-    any make_any(const T1& t1, const T2& t2) NOEXCEPT;
-
 private:
     class base
     {
