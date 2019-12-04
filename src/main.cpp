@@ -69,6 +69,31 @@ public:
         data += t7;
     }
 
+    Object(int t1, int t2, int t3, int t4, int t5, int t6, int t7, int t8)
+    {
+        data += t1;
+        data += t2;
+        data += t3;
+        data += t4;
+        data += t5;
+        data += t6;
+        data += t7;
+        data += t8;
+    }
+
+    Object(int t1, int t2, int t3, int t4, int t5, int t6, int t7, int t8, int t9)
+    {
+        data += t1;
+        data += t2;
+        data += t3;
+        data += t4;
+        data += t5;
+        data += t6;
+        data += t7;
+        data += t8;
+        data += t9;
+    }
+
     ~Object()
     {
     }
@@ -161,5 +186,11 @@ int main(int argc, char* argv[])
 
     auto o7 = make_any<Object>(1, 1, 1, 1, 1, 1, 1);
     test<Object>("o7", o7);
+
+    auto o8 = make_any<Object>(1, 1, 1, 1, 1, 1, 1, 1);
+    test<Object>("o8", o8);
+
+    auto o9 = make_any<Object>(1, 1, 1, 1, 1, 1, 1, 1, 1);
+    test<Object>("o9", o9);
     return 0;
 }
