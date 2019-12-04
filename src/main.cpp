@@ -48,6 +48,16 @@ public:
         data += t5;
     }
 
+    Object(int t1, int t2, int t3, int t4, int t5, int t6)
+    {
+        data += t1;
+        data += t2;
+        data += t3;
+        data += t4;
+        data += t5;
+        data += t6;
+    }
+
     ~Object()
     {
     }
@@ -134,5 +144,8 @@ int main(int argc, char* argv[])
 
     auto o5 = make_any<Object>(1, 1, 1, 1, 1);
     test<Object>("o5", o5);
+
+    auto o6 = make_any<Object>(1, 1, 1, 1, 1, 1);
+    test<Object>("o6", o6);
     return 0;
 }
