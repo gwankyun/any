@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
     auto o2 = make_any<Object>(1, 1);
     test<Object>("o2", o2);
     o2.emplace<Object>(1, 2);
-    test<Object>("o2", o2);
+    test<Object>("o2 emplace 2", o2);
 
     auto o3 = make_any<Object>(1, 2);
     auto io3 = any_cast<Object>(o3);
@@ -178,19 +178,43 @@ int main(int argc, char* argv[])
     //auto o5 = make_any<Object>(1, 1, 1, 1);
     //test<Object>("o5", o5);
 
-    auto o5 = make_any<Object>(1, 1, 1, 1, 1);
-    test<Object>("o5", o5);
+    {
+        std::cout << "make_any" << std::endl;
+        auto o1 = make_any<Object>(1);
+        test<Object>("o1", o1);
 
-    auto o6 = make_any<Object>(1, 1, 1, 1, 1, 1);
-    test<Object>("o6", o6);
+        auto o2 = make_any<Object>(1, 1);
+        test<Object>("o2", o2);
 
-    auto o7 = make_any<Object>(1, 1, 1, 1, 1, 1, 1);
-    test<Object>("o7", o7);
+        auto o3 = make_any<Object>(1, 1);
+        test<Object>("o3", o3);
 
-    auto o8 = make_any<Object>(1, 1, 1, 1, 1, 1, 1, 1);
-    test<Object>("o8", o8);
+        auto o4 = make_any<Object>(1, 1, 1);
+        test<Object>("o4", o4);
 
-    auto o9 = make_any<Object>(1, 1, 1, 1, 1, 1, 1, 1, 1);
-    test<Object>("o9", o9);
+        auto o5 = make_any<Object>(1, 1, 1, 1, 1);
+        test<Object>("o5", o5);
+
+        auto o6 = make_any<Object>(1, 1, 1, 1, 1, 1);
+        test<Object>("o6", o6);
+
+        auto o7 = make_any<Object>(1, 1, 1, 1, 1, 1, 1);
+        test<Object>("o7", o7);
+
+        auto o8 = make_any<Object>(1, 1, 1, 1, 1, 1, 1, 1);
+        test<Object>("o8", o8);
+
+        auto o9 = make_any<Object>(1, 1, 1, 1, 1, 1, 1, 1, 1);
+        test<Object>("o9", o9);
+
+        o1.emplace<Object>(0);
+        test<Object>("emplace 1", o1);
+
+        o1.emplace<Object>(0, 1);
+        test<Object>("emplace 2", o1);
+
+        o1.emplace<Object>(0, 1, 1);
+        test<Object>("emplace 3", o1);
+    }
     return 0;
 }
