@@ -230,6 +230,9 @@ int main(int argc, char* argv[])
 
         o1.emplace<Object>(0, 1, 1, 1, 1, 1, 1, 1);
         test<Object>("emplace 8", o1);
+
+        o1.emplace<Object>(0, 1, 1, 1, 1, 1, 1, 1, 1);
+        test<Object>("emplace 9", o1);
     }
     return 0;
 }
