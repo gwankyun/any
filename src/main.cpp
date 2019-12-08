@@ -224,6 +224,9 @@ int main(int argc, char* argv[])
 
         o1.emplace<Object>(0, 1, 1, 1, 1, 1);
         test<Object>("emplace 6", o1);
+
+        o1.emplace<Object>(0, 1, 1, 1, 1, 1, 1);
+        test<Object>("emplace 7", o1);
     }
     return 0;
 }
