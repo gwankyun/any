@@ -73,6 +73,14 @@ public:
         return dynamic_cast<derived<T>*>(b)->value;
     }
 
+    template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
+    T& emplace(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5)
+    {
+        reset();
+        *this = T(t1, t2, t3, t4, t5);
+        return dynamic_cast<derived<T>*>(b)->value;
+    }
+
     ~any()
     {
         reset();
