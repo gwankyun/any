@@ -46,7 +46,7 @@ public:
     {
         reset();
         *this = value;
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     template<typename T, typename T1, typename T2>
@@ -54,7 +54,7 @@ public:
     {
         reset();
         *this = T(t1, t2);
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     template<typename T, typename T1, typename T2, typename T3>
@@ -62,7 +62,7 @@ public:
     {
         reset();
         *this = T(t1, t2, t3);
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4>
@@ -70,7 +70,7 @@ public:
     {
         reset();
         *this = T(t1, t2, t3, t4);
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -78,7 +78,7 @@ public:
     {
         reset();
         *this = T(t1, t2, t3, t4, t5);
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
@@ -86,7 +86,7 @@ public:
     {
         reset();
         *this = T(t1, t2, t3, t4, t5, t6);
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
@@ -94,7 +94,7 @@ public:
     {
         reset();
         *this = T(t1, t2, t3, t4, t5, t6, t7);
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
@@ -102,7 +102,7 @@ public:
     {
         reset();
         *this = T(t1, t2, t3, t4, t5, t6, t7, t8);
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
@@ -110,7 +110,7 @@ public:
     {
         reset();
         *this = T(t1, t2, t3, t4, t5, t6, t7, t8, t9);
-        return dynamic_cast<derived<T>*>(b)->value;
+        return get_value<T>();
     }
 
     ~any()
@@ -222,6 +222,12 @@ private:
     private:
 
     };
+
+    template<typename T>
+    T& get_value()
+    {
+        return dynamic_cast<derived<T>*>(b)->value;
+    }
 
     base* b;
 };

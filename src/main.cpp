@@ -178,6 +178,11 @@ int main(int argc, char* argv[])
     //auto o5 = make_any<Object>(1, 1, 1, 1);
     //test<Object>("o5", o5);
 
+    //{
+    //    any o1<Object>(1);
+    //    test<Object>("o1", o1);
+    //}
+
     {
         std::cout << "make_any" << std::endl;
         auto o1 = make_any<Object>(1);
