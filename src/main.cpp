@@ -239,5 +239,10 @@ int main(int argc, char* argv[])
         o1.emplace<Object>(0, 1, 1, 1, 1, 1, 1, 1, 1);
         test<Object>("emplace 9", o1);
     }
+
+    {
+        any a;
+        any b(a);
+    }
     return 0;
 }

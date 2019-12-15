@@ -32,7 +32,7 @@ public:
     {
     }
 
-    any(const any& other) : b(other.b->clone())
+    any(const any& other) : b(other.has_value() ? other.b->clone() : NULL)
     {
     }
 
