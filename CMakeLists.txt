@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # 包含模塊
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 include(CMakePrintHelpers)
 
 # 輸出目錄
@@ -15,6 +16,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 # 項目名
 set(PROJECT any)
 project(${PROJECT})
+
+set(ANY_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+find_package(ANY)
+if(ANY_INCLUDE_DIR)
+    cmake_print_variables(ANY_INCLUDE_DIR)
+endif()
 
 # 源目錄
 set(MAIN_DIR src)
@@ -35,7 +42,7 @@ set(MAIN_FILE main)
 
 add_executable(${PROJECT} "")
 target_sources(${PROJECT} PRIVATE ${MAIN_DIR}/${MAIN_FILE}.cpp)
-target_include_directories(${PROJECT} PRIVATE include)
+target_include_directories(${PROJECT} PRIVATE ${ANY_INCLUDE_DIR})
 # target_link_libraries(${PROJECT} ${Boost_LIBRARIES})
 
 if(${MSVC})
