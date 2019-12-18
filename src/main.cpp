@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
 
     any a7;
     a7 = 6;
-    auto i7 = a7.emplace(7);
+    auto i7 = a7.emplace<int>(7);
     test<int>("a7", a7);
     std::cout << "i7: " << i7 << std::endl;
     Object obj;
