@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
-//#include "any.hpp"
 #include <any/any.hpp>
 
 class Object
