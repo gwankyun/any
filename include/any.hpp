@@ -101,9 +101,6 @@ public:
     template<typename T>
     friend T* any_cast(any* operand) NOEXCEPT;
 
-    template<typename T>
-    friend any make_any(const T& value) NOEXCEPT;
-
 #ifdef __cpp_variadic_templates
     template<typename T, typename ...Args>
     T& emplace(Args&& ...args)
