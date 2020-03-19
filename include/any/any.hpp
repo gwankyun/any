@@ -3,12 +3,26 @@
 #include <typeinfo>
 #include <type_traits>
 
+#ifdef _MSC_VER
+
+#if _MSC_VER >= 1900
+#ifndef CXX_NOEXCEPT
+#define CXX_NOEXCEPT
+#endif // !CXX_NOEXCEPT
+#endif // _MSC_VER >= 1900
+
+#endif // _MSC_VER
+
+#ifdef CXX_NOEXCEPT
+#define NOEXCEPT noexcept
+#else
 #define NOEXCEPT
+#endif // CXX_NOEXCEPT
 
 class bad_any_cast : public std::bad_cast
 {
 public:
-    bad_any_cast()
+    bad_any_cast() NOEXCEPT
     {
     }
 
@@ -79,7 +93,7 @@ public:
         return *this;
     }
 
-    void swap(any& other)
+    void swap(any& other) NOEXCEPT
     {
         base* temp = b;
         b = other.b;
