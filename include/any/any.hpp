@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <typeinfo>
 #include <type_traits>
+#include <utility>
 
 #ifdef _MSC_VER
 
@@ -55,6 +56,19 @@ public:
     explicit any(const T& value) : b(new derived<T>(value))
     {
     }
+
+#ifdef __cpp_rvalue_references
+    any(any&& other) NOEXCEPT : b(NULL)
+    {
+        swap(other);
+    }
+
+    template<typename T>
+    explicit any(T&& value) : b(new derived<T>(value))
+    {
+    }
+#endif // __cpp_rvalue_references
+
 
     ~any()
     {
@@ -221,7 +235,7 @@ private:
     class derived : public base
     {
     public:
-        derived(const T& value_) : value(value_)
+        explicit derived(const T& value_) : value(value_)
         {
         }
 

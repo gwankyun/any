@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <any/any.hpp>
 
 class Object
@@ -243,6 +244,7 @@ int main(int argc, char* argv[])
     {
         any a;
         any b(a);
+        any c(std::move(b));
     }
     return 0;
 }
