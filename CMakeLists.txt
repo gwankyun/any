@@ -14,13 +14,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 # 項目名
-set(PROJECT any)
-project(${PROJECT})
+set(project any)
+project(${project})
 
-set(ANY_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-find_package(ANY)
-if(ANY_INCLUDE_DIR)
-    cmake_print_variables(ANY_INCLUDE_DIR)
+set(Any_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+find_package(Any)
+if(Any_FOUND)
+    cmake_print_variables(Any_INCLUDE_DIRS)
 endif()
 
 # 源目錄
@@ -40,9 +40,9 @@ set(MAIN_FILE main)
 # 	cmake_print_variables(Boost_LIB_VERSION)
 # endif()
 
-add_executable(${PROJECT} "")
-target_sources(${PROJECT} PRIVATE ${MAIN_DIR}/${MAIN_FILE}.cpp)
-target_include_directories(${PROJECT} PRIVATE ${ANY_INCLUDE_DIR})
+add_executable(${project} "")
+target_sources(${project} PRIVATE ${MAIN_DIR}/${MAIN_FILE}.cpp)
+target_include_directories(${project} PRIVATE ${Any_INCLUDE_DIRS})
 # target_link_libraries(${PROJECT} ${Boost_LIBRARIES})
 
 if(${MSVC})

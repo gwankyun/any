@@ -1,4 +1,4 @@
-﻿if(ANY_ROOT)
-    set(ANY_INCLUDE_DIR ${ANY_ROOT}/include)
-    set(ANY_ROOT TRUE)
+﻿if(Any_ROOT_DIR)
+    set(Any_INCLUDE_DIRS ${Any_ROOT_DIR}/include)
+    set(Any_FOUND TRUE)
 endif()
