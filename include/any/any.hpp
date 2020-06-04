@@ -1,24 +1,32 @@
-#pragma once
+﻿#pragma once
 #include <cstddef>
 #include <typeinfo>
 #include <type_traits>
 #include <utility>
 
-#ifdef _MSC_VER
-
-#if _MSC_VER >= 1900
+#if defined(_MSC_VER) && _MSC_VER >= 1900
 #ifndef CXX_NOEXCEPT
 #define CXX_NOEXCEPT
 #endif // !CXX_NOEXCEPT
-#endif // _MSC_VER >= 1900
+#endif
 
-#endif // _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#ifndef CXX_CONSTEXPR
+#define CXX_CONSTEXPR
+#endif // !CXX_CONSTEXPR
+#endif
 
 #ifdef CXX_NOEXCEPT
 #define NOEXCEPT noexcept
 #else
 #define NOEXCEPT
 #endif // CXX_NOEXCEPT
+
+#ifdef CXX_CONSTEXPR
+#define CONSTEXPR constexpr
+#else
+#define CONSTEXPR
+#endif // CXX_CONSTEXPR
 
 class bad_any_cast : public std::bad_cast
 {
@@ -44,16 +52,11 @@ class any
 {
 public:
 
-    any() NOEXCEPT : b(NULL)
+    CONSTEXPR any() NOEXCEPT : b(NULL)
     {
     }
 
     any(const any& other) : b(other.has_value() ? other.b->clone() : NULL)
-    {
-    }
-
-    template<typename T>
-    explicit any(const T& value) : b(new derived<T>(value))
     {
     }
 
@@ -69,24 +72,9 @@ public:
     }
 #endif // __cpp_rvalue_references
 
-
-    ~any()
+    template<typename T>
+    explicit any(const T& value) : b(new derived<T>(value))
     {
-        reset();
-    }
-
-    void reset() NOEXCEPT
-    {
-        if (has_value())
-        {
-            delete b;
-            b = NULL;
-        }
-    }
-
-    bool has_value() const NOEXCEPT
-    {
-        return b != NULL;
     }
 
     any& operator=(const any& other)
@@ -107,27 +95,12 @@ public:
         return *this;
     }
 
-    void swap(any& other) NOEXCEPT
+    ~any()
     {
-        base* temp = b;
-        b = other.b;
-        other.b = temp;
+        reset();
     }
 
-    const std::type_info& type() const NOEXCEPT
-    {
-        if (has_value())
-        {
-            return b->type();
-        }
-        else
-        {
-            return typeid(void);
-        }
-    }
-
-    template<typename T>
-    friend T* any_cast(any* operand) NOEXCEPT;
+    // 修改器
 
 #ifdef __cpp_variadic_templates
     template<typename T, typename ...Args>
@@ -210,6 +183,44 @@ public:
         return get_value<T>();
     }
 #endif // __cpp_variadic_templates
+
+    void reset() NOEXCEPT
+    {
+        if (has_value())
+        {
+            delete b;
+            b = NULL;
+        }
+    }
+
+    void swap(any& other) NOEXCEPT
+    {
+        base* temp = b;
+        b = other.b;
+        other.b = temp;
+    }
+
+    // 觀察器
+
+    bool has_value() const NOEXCEPT
+    {
+        return b != NULL;
+    }
+
+    const std::type_info& type() const NOEXCEPT
+    {
+        if (has_value())
+        {
+            return b->type();
+        }
+        else
+        {
+            return typeid(void);
+        }
+    }
+
+    template<typename T>
+    friend T* any_cast(any* operand) NOEXCEPT;
 
 private:
     class base
