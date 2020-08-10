@@ -41,7 +41,7 @@ set(MAIN_FILE main)
 # endif()
 
 add_executable(${project} "")
-target_sources(${project} PRIVATE ${MAIN_DIR}/${MAIN_FILE}.cpp)
+target_sources(${project} PRIVATE ${MAIN_DIR}/${MAIN_FILE}.cpp include/any/any.hpp)
 target_include_directories(${project} PRIVATE ${Any_INCLUDE_DIRS})
 # target_link_libraries(${PROJECT} ${Boost_LIBRARIES})
 

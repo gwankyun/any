@@ -28,6 +28,12 @@
 #define CONSTEXPR
 #endif // CXX_CONSTEXPR
 
+#if defined(__cpp_rvalue_references)
+#define ANY_ARG(T) T&&
+#else
+#define ANY_ARG(T) const T&
+#endif // defined(__cpp_rvalue_references)
+
 class bad_any_cast : public std::bad_cast
 {
 public:
@@ -52,28 +58,28 @@ class any
 {
 public:
 
-    CONSTEXPR any() NOEXCEPT : b(NULL)
+    CONSTEXPR any() NOEXCEPT : base(NULL)
     {
     }
 
-    any(const any& other) : b(other.has_value() ? other.b->clone() : NULL)
+    any(const any& other) : base(other.has_value() ? other.base->clone() : NULL)
     {
     }
 
 #ifdef __cpp_rvalue_references
-    any(any&& other) NOEXCEPT : b(NULL)
+    any(any&& other) NOEXCEPT : base(NULL)
     {
         swap(other);
     }
 
     template<typename T>
-    explicit any(T&& value) : b(new derived<T>(value))
+    explicit any(T&& value) : base(new Derived<T>(value))
     {
     }
 #endif // __cpp_rvalue_references
 
     template<typename T>
-    explicit any(const T& value) : b(new derived<T>(value))
+    explicit any(const T& value) : base(new Derived<T>(value))
     {
     }
 
@@ -82,7 +88,7 @@ public:
         if (this != &other)
         {
             reset();
-            b = other.b->clone();
+            base = other.base->clone();
         }
         return *this;
     }
@@ -91,7 +97,7 @@ public:
     any& operator=(const T& rhs)
     {
         reset();
-        b = new derived<T>(rhs);
+        base = new Derived<T>(rhs);
         return *this;
     }
 
@@ -102,7 +108,7 @@ public:
 
     // 修改器
 
-#ifdef __cpp_variadic_templates
+#if defined(__cpp_variadic_templates)
     template<typename T, typename ...Args>
     T& emplace(Args&& ...args)
     {
@@ -112,7 +118,7 @@ public:
     }
 #else
     template<typename T>
-    T& emplace(const T& value)
+    T& emplace(ANY_ARG(T) value)
     {
         reset();
         *this = value;
@@ -120,7 +126,7 @@ public:
     }
 
     template<typename T, typename T1, typename T2>
-    T& emplace(const T1& t1, const T2& t2)
+    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2)
     {
         reset();
         *this = T(t1, t2);
@@ -128,7 +134,7 @@ public:
     }
 
     template<typename T, typename T1, typename T2, typename T3>
-    T& emplace(const T1& t1, const T2& t2, const T3& t3)
+    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3)
     {
         reset();
         *this = T(t1, t2, t3);
@@ -136,7 +142,7 @@ public:
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4>
-    T& emplace(const T1& t1, const T2& t2, const T3& t3, const T4& t4)
+    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4)
     {
         reset();
         *this = T(t1, t2, t3, t4);
@@ -144,7 +150,7 @@ public:
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
-    T& emplace(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5)
+    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5)
     {
         reset();
         *this = T(t1, t2, t3, t4, t5);
@@ -152,7 +158,7 @@ public:
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-    T& emplace(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6)
+    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6)
     {
         reset();
         *this = T(t1, t2, t3, t4, t5, t6);
@@ -160,7 +166,7 @@ public:
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-    T& emplace(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6, const T7& t7)
+    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7)
     {
         reset();
         *this = T(t1, t2, t3, t4, t5, t6, t7);
@@ -168,7 +174,7 @@ public:
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-    T& emplace(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6, const T7& t7, const T8& t8)
+    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8)
     {
         reset();
         *this = T(t1, t2, t3, t4, t5, t6, t7, t8);
@@ -176,42 +182,42 @@ public:
     }
 
     template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-    T& emplace(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6, const T7& t7, const T8& t8, const T9& t9)
+    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8, ANY_ARG(T9) t9)
     {
         reset();
         *this = T(t1, t2, t3, t4, t5, t6, t7, t8, t9);
         return get_value<T>();
     }
-#endif // __cpp_variadic_templates
+#endif // defined(__cpp_variadic_templates)
 
     void reset() NOEXCEPT
     {
         if (has_value())
         {
-            delete b;
-            b = NULL;
+            delete base;
+            base = NULL;
         }
     }
 
     void swap(any& other) NOEXCEPT
     {
-        base* temp = b;
-        b = other.b;
-        other.b = temp;
+        Base* temp = base;
+        base = other.base;
+        other.base = temp;
     }
 
     // 觀察器
 
     bool has_value() const NOEXCEPT
     {
-        return b != NULL;
+        return base != NULL;
     }
 
     const std::type_info& type() const NOEXCEPT
     {
         if (has_value())
         {
-            return b->type();
+            return base->type();
         }
         else
         {
@@ -223,34 +229,34 @@ public:
     friend T* any_cast(any* operand) NOEXCEPT;
 
 private:
-    class base
+    class Base
     {
     public:
-        base() NOEXCEPT
+        Base() NOEXCEPT
         {
         }
 
-        virtual ~base()
+        virtual ~Base()
         {
         }
 
         virtual const std::type_info& type() const NOEXCEPT = 0;
 
-        virtual base* clone() = 0;
+        virtual Base* clone() = 0;
 
     private:
 
     };
 
     template<typename T>
-    class derived : public base
+    class Derived : public Base
     {
     public:
-        explicit derived(const T& value_) : value(value_)
+        explicit Derived(const T& value_) : value(value_)
         {
         }
 
-        ~derived()
+        ~Derived()
         {
         }
 
@@ -259,9 +265,9 @@ private:
             return typeid(value);
         }
 
-        base* clone()
+        Base* clone()
         {
-            return new derived<T>(value);
+            return new Derived<T>(value);
         }
 
         T value;
@@ -273,16 +279,16 @@ private:
     template<typename T>
     T& get_value()
     {
-        return dynamic_cast<derived<T>*>(b)->value;
+        return dynamic_cast<Derived<T>*>(base)->value;
     }
 
-    base* b;
+    Base* base;
 };
 
 template<typename T>
 T* any_cast(any* operand) NOEXCEPT
 {
-    any::derived<T>* d = dynamic_cast<any::derived<T>*>(operand->b);
+    any::Derived<T>* d = dynamic_cast<any::Derived<T>*>(operand->base);
     if (d != NULL)
     {
         return &(d->value);
@@ -324,7 +330,7 @@ inline void swap(any& lhs, any& rhs) NOEXCEPT
     lhs.swap(rhs);
 }
 
-#ifdef __cpp_variadic_templates
+#if defined(__cpp_variadic_templates)
 template<typename T, typename ...Args>
 any make_any(Args&& ...args) NOEXCEPT
 {
@@ -332,56 +338,56 @@ any make_any(Args&& ...args) NOEXCEPT
 }
 #else
 template<typename T>
-any make_any(const T& value) NOEXCEPT
+any make_any(ANY_ARG(T) value) NOEXCEPT
 {
     return any(value);
 }
 
 template<typename T, typename T1, typename T2>
-any make_any(const T1& t1, const T2& t2) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2) NOEXCEPT
 {
     return any(T(t1, t2));
 }
 
 template<typename T, typename T1, typename T2, typename T3>
-any make_any(const T1& t1, const T2& t2, const T3& t3) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3) NOEXCEPT
 {
     return any(T(t1, t2, t3));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4>
-any make_any(const T1& t1, const T2& t2, const T3& t3, const T4& t4) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4) NOEXCEPT
 {
     return any(T(t1, t2, t3, t4));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
-any make_any(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5) NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-any make_any(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6) NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5, t6));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-any make_any(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6, const T7& t7) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7) NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5, t6, t7));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-any make_any(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6, const T7& t7, const T8& t8) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8) NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5, t6, t7, t8));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-any make_any(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6, const T7& t7, const T8& t8, const T9& t9) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8, ANY_ARG(T9) t9) NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5, t6, t7, t8, t9));
 }
-#endif // __cpp_variadic_templates
+#endif // defined(__cpp_variadic_templates)
