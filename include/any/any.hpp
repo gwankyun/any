@@ -3,41 +3,28 @@
 #include <typeinfo>
 #include <type_traits>
 #include <utility>
+#include "compiler_detection.h"
 
-#if defined(_MSC_VER) && _MSC_VER >= 1900
-#ifndef CXX_NOEXCEPT
-#define CXX_NOEXCEPT
-#endif // !CXX_NOEXCEPT
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER >= 1900
-#ifndef CXX_CONSTEXPR
-#define CXX_CONSTEXPR
-#endif // !CXX_CONSTEXPR
-#endif
-
-#ifdef CXX_NOEXCEPT
-#define NOEXCEPT noexcept
-#else
-#define NOEXCEPT
-#endif // CXX_NOEXCEPT
-
-#ifdef CXX_CONSTEXPR
-#define CONSTEXPR constexpr
-#else
-#define CONSTEXPR
-#endif // CXX_CONSTEXPR
-
+#ifndef ANY_ARG
 #if defined(__cpp_rvalue_references)
 #define ANY_ARG(T) T&&
 #else
 #define ANY_ARG(T) const T&
 #endif // defined(__cpp_rvalue_references)
+#endif // !ANY_ARG
+
+#ifndef ANY_HAS_CXX_11
+#if defined(__cpp_rvalue_references)
+#define ANY_HAS_CXX_11 1
+#else
+#define ANY_HAS_CXX_11 0
+#endif // defined(__cpp_rvalue_references)
+#endif // ANY_HAS_CXX_11
 
 class bad_any_cast : public std::bad_cast
 {
 public:
-    bad_any_cast() NOEXCEPT
+    bad_any_cast() FEATURE_NOEXCEPT
     {
     }
 
@@ -45,7 +32,7 @@ public:
     {
     }
 
-    char const* what() const NOEXCEPT
+    char const* what() const FEATURE_NOEXCEPT
     {
         return "bad_any_cast";
     }
@@ -58,7 +45,7 @@ class any
 {
 public:
 
-    CONSTEXPR any() NOEXCEPT : base(NULL)
+    FEATURE_CONSTEXPR any() FEATURE_NOEXCEPT : base(NULL)
     {
     }
 
@@ -66,8 +53,8 @@ public:
     {
     }
 
-#ifdef __cpp_rvalue_references
-    any(any&& other) NOEXCEPT : base(NULL)
+#if ANY_HAS_CXX_11
+    any(any&& other) FEATURE_NOEXCEPT : base(NULL)
     {
         swap(other);
     }
@@ -76,7 +63,7 @@ public:
     explicit any(T&& value) : base(new Derived<T>(value))
     {
     }
-#endif // __cpp_rvalue_references
+#endif // ANY_HAS_CXX_11
 
     template<typename T>
     explicit any(const T& value) : base(new Derived<T>(value))
@@ -108,7 +95,7 @@ public:
 
     // 修改器
 
-#if defined(__cpp_variadic_templates)
+#if ANY_HAS_CXX_11
     template<typename T, typename ...Args>
     T& emplace(Args&& ...args)
     {
@@ -188,9 +175,9 @@ public:
         *this = T(t1, t2, t3, t4, t5, t6, t7, t8, t9);
         return get_value<T>();
     }
-#endif // defined(__cpp_variadic_templates)
+#endif // ANY_HAS_CXX_11
 
-    void reset() NOEXCEPT
+    void reset() FEATURE_NOEXCEPT
     {
         if (has_value())
         {
@@ -199,7 +186,7 @@ public:
         }
     }
 
-    void swap(any& other) NOEXCEPT
+    void swap(any& other) FEATURE_NOEXCEPT
     {
         Base* temp = base;
         base = other.base;
@@ -208,12 +195,12 @@ public:
 
     // 觀察器
 
-    bool has_value() const NOEXCEPT
+    bool has_value() const FEATURE_NOEXCEPT
     {
         return base != NULL;
     }
 
-    const std::type_info& type() const NOEXCEPT
+    const std::type_info& type() const FEATURE_NOEXCEPT
     {
         if (has_value())
         {
@@ -226,13 +213,13 @@ public:
     }
 
     template<typename T>
-    friend T* any_cast(any* operand) NOEXCEPT;
+    friend T* any_cast(any* operand) FEATURE_NOEXCEPT;
 
 private:
     class Base
     {
     public:
-        Base() NOEXCEPT
+        Base() FEATURE_NOEXCEPT
         {
         }
 
@@ -240,7 +227,7 @@ private:
         {
         }
 
-        virtual const std::type_info& type() const NOEXCEPT = 0;
+        virtual const std::type_info& type() const FEATURE_NOEXCEPT = 0;
 
         virtual Base* clone() = 0;
 
@@ -260,12 +247,12 @@ private:
         {
         }
 
-        const std::type_info& type() const NOEXCEPT
+        const std::type_info& type() const FEATURE_NOEXCEPT FEATURE_OVERRIDE
         {
             return typeid(value);
         }
 
-        Base* clone()
+        Base* clone() FEATURE_OVERRIDE
         {
             return new Derived<T>(value);
         }
@@ -286,7 +273,7 @@ private:
 };
 
 template<typename T>
-T* any_cast(any* operand) NOEXCEPT
+T* any_cast(any* operand) FEATURE_NOEXCEPT
 {
     any::Derived<T>* d = dynamic_cast<any::Derived<T>*>(operand->base);
     if (d != NULL)
@@ -300,7 +287,7 @@ T* any_cast(any* operand) NOEXCEPT
 }
 
 template<typename T>
-const T* any_cast(const any* operand) NOEXCEPT
+const T* any_cast(const any* operand) FEATURE_NOEXCEPT
 {
     return any_cast<T>(const_cast<any*>(operand));
 }
@@ -325,69 +312,69 @@ T any_cast(const any& operand)
     return any_cast<T>(const_cast<any&>(operand));
 }
 
-inline void swap(any& lhs, any& rhs) NOEXCEPT
+inline void swap(any& lhs, any& rhs) FEATURE_NOEXCEPT
 {
     lhs.swap(rhs);
 }
 
-#if defined(__cpp_variadic_templates)
+#if ANY_HAS_CXX_11
 template<typename T, typename ...Args>
-any make_any(Args&& ...args) NOEXCEPT
+any make_any(Args&& ...args) FEATURE_NOEXCEPT
 {
     return any(T(std::forward<Args>(args)...));
 }
 #else
 template<typename T>
-any make_any(ANY_ARG(T) value) NOEXCEPT
+any make_any(ANY_ARG(T) value) FEATURE_NOEXCEPT
 {
     return any(value);
 }
 
 template<typename T, typename T1, typename T2>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2) FEATURE_NOEXCEPT
 {
     return any(T(t1, t2));
 }
 
 template<typename T, typename T1, typename T2, typename T3>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3) FEATURE_NOEXCEPT
 {
     return any(T(t1, t2, t3));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4) FEATURE_NOEXCEPT
 {
     return any(T(t1, t2, t3, t4));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5) FEATURE_NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6) FEATURE_NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5, t6));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7) FEATURE_NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5, t6, t7));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8) FEATURE_NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5, t6, t7, t8));
 }
 
 template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8, ANY_ARG(T9) t9) NOEXCEPT
+any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8, ANY_ARG(T9) t9) FEATURE_NOEXCEPT
 {
     return any(T(t1, t2, t3, t4, t5, t6, t7, t8, t9));
 }
-#endif // defined(__cpp_variadic_templates)
+#endif // ANY_HAS_CXX_11
