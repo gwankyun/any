@@ -21,6 +21,68 @@
 #endif // defined(__cpp_rvalue_references)
 #endif // ANY_HAS_CXX_11
 
+#if !ANY_HAS_CXX_11
+#define EXTEND1(arg_, fn_, s_) fn_(arg_, 1)
+#define EXTEND2(arg_, fn_, s_) s_(fn_(arg_, 1)) fn_(arg_, 2)
+#define EXTEND3(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) fn_(arg_, 3)
+#define EXTEND4(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) fn_(arg_, 4)
+#define EXTEND5(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) fn_(arg_, 5)
+#define EXTEND6(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) s_(fn_(arg_, 5)) fn_(arg_, 6)
+#define EXTEND7(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) s_(fn_(arg_, 5)) s_(fn_(arg_, 6)) fn_(arg_, 7)
+#define EXTEND8(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) s_(fn_(arg_, 5)) s_(fn_(arg_, 6)) s_(fn_(arg_, 7)) fn_(arg_, 8)
+#define EXTEND9(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) s_(fn_(arg_, 5)) s_(fn_(arg_, 6)) s_(fn_(arg_, 7)) s_(fn_(arg_, 8)) fn_(arg_, 9)
+
+#define DEFINE(arg_) \
+    arg_(1) \
+    \
+    arg_(2) \
+    \
+    arg_(3) \
+    \
+    arg_(4) \
+    \
+    arg_(5) \
+    \
+    arg_(6) \
+    \
+    arg_(7) \
+    \
+    arg_(8) \
+    \
+    arg_(9)
+
+#define COMMA(x) x,
+#define SEMICOLON(x) x;
+
+#define EXTEND(arg_, fn_, n_, D) EXTEND##n_(arg_, fn_, D)
+
+#define ARGUMENT(x, n) x##n
+
+#define PARAMETER(x, n) ANY_ARG(x##n) _##x##n
+
+#define TYPENAME(x, n) typename x##n
+
+#define TYPENAME_N(a_, n_)  EXTEND(a_, TYPENAME, n_, COMMA)
+#define PARAMETER_N(a_, n_) EXTEND(a_, PARAMETER, n_, COMMA)
+#define ARGUMENT_N(a_, n_) EXTEND(a_, ARGUMENT, n_, COMMA)
+
+#define MAKE_ANY(x) \
+    template<typename T, TYPENAME_N(T, x)> \
+    any make_any(PARAMETER_N(T, x)) FEATURE_NOEXCEPT \
+    { \
+        return any(T(ARGUMENT_N(_T, x))); \
+    }
+
+#define ANY_EMPLACE(x) \
+    template<typename T, TYPENAME_N(T, x)> \
+    T& emplace(PARAMETER_N(T, x)) \
+    { \
+        reset(); \
+        *this = T(ARGUMENT_N(_T, x)); \
+        return get_value<T>(); \
+    }
+#endif // !ANY_HAS_CXX_11
+
 class bad_any_cast : public std::bad_cast
 {
 public:
@@ -104,80 +166,10 @@ public:
         return get_value<T>();
     }
 #else
-    template<typename T>
-    T& emplace(ANY_ARG(T) value)
-    {
-        reset();
-        *this = value;
-        return get_value<T>();
-    }
-
-    template<typename T, typename T1, typename T2>
-    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2)
-    {
-        reset();
-        *this = T(t1, t2);
-        return get_value<T>();
-    }
-
-    template<typename T, typename T1, typename T2, typename T3>
-    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3)
-    {
-        reset();
-        *this = T(t1, t2, t3);
-        return get_value<T>();
-    }
-
-    template<typename T, typename T1, typename T2, typename T3, typename T4>
-    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4)
-    {
-        reset();
-        *this = T(t1, t2, t3, t4);
-        return get_value<T>();
-    }
-
-    template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
-    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5)
-    {
-        reset();
-        *this = T(t1, t2, t3, t4, t5);
-        return get_value<T>();
-    }
-
-    template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6)
-    {
-        reset();
-        *this = T(t1, t2, t3, t4, t5, t6);
-        return get_value<T>();
-    }
-
-    template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7)
-    {
-        reset();
-        *this = T(t1, t2, t3, t4, t5, t6, t7);
-        return get_value<T>();
-    }
-
-    template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8)
-    {
-        reset();
-        *this = T(t1, t2, t3, t4, t5, t6, t7, t8);
-        return get_value<T>();
-    }
-
-    template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-    T& emplace(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8, ANY_ARG(T9) t9)
-    {
-        reset();
-        *this = T(t1, t2, t3, t4, t5, t6, t7, t8, t9);
-        return get_value<T>();
-    }
+    DEFINE(ANY_EMPLACE)
 #endif // ANY_HAS_CXX_11
 
-    void reset() FEATURE_NOEXCEPT
+        void reset() FEATURE_NOEXCEPT
     {
         if (has_value())
         {
@@ -324,57 +316,5 @@ any make_any(Args&& ...args) FEATURE_NOEXCEPT
     return any(T(std::forward<Args>(args)...));
 }
 #else
-template<typename T>
-any make_any(ANY_ARG(T) value) FEATURE_NOEXCEPT
-{
-    return any(value);
-}
-
-template<typename T, typename T1, typename T2>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2) FEATURE_NOEXCEPT
-{
-    return any(T(t1, t2));
-}
-
-template<typename T, typename T1, typename T2, typename T3>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3) FEATURE_NOEXCEPT
-{
-    return any(T(t1, t2, t3));
-}
-
-template<typename T, typename T1, typename T2, typename T3, typename T4>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4) FEATURE_NOEXCEPT
-{
-    return any(T(t1, t2, t3, t4));
-}
-
-template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5) FEATURE_NOEXCEPT
-{
-    return any(T(t1, t2, t3, t4, t5));
-}
-
-template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6) FEATURE_NOEXCEPT
-{
-    return any(T(t1, t2, t3, t4, t5, t6));
-}
-
-template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7) FEATURE_NOEXCEPT
-{
-    return any(T(t1, t2, t3, t4, t5, t6, t7));
-}
-
-template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8) FEATURE_NOEXCEPT
-{
-    return any(T(t1, t2, t3, t4, t5, t6, t7, t8));
-}
-
-template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-any make_any(ANY_ARG(T1) t1, ANY_ARG(T2) t2, ANY_ARG(T3) t3, ANY_ARG(T4) t4, ANY_ARG(T5) t5, ANY_ARG(T6) t6, ANY_ARG(T7) t7, ANY_ARG(T8) t8, ANY_ARG(T9) t9) FEATURE_NOEXCEPT
-{
-    return any(T(t1, t2, t3, t4, t5, t6, t7, t8, t9));
-}
+DEFINE(MAKE_ANY)
 #endif // ANY_HAS_CXX_11
