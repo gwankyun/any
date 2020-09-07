@@ -4,6 +4,9 @@
 #include <type_traits>
 #include <utility>
 #include "compiler_detection.h"
+#include <boost/preprocessor/comma_if.hpp>
+#include <boost/preprocessor/repeat.hpp>
+#include <boost/preprocessor/inc.hpp>
 
 #ifndef ANY_ARG
 #if defined(__cpp_rvalue_references)
@@ -22,65 +25,29 @@
 #endif // ANY_HAS_CXX_11
 
 #if !ANY_HAS_CXX_11
-#define EXTEND1(arg_, fn_, s_) fn_(arg_, 1)
-#define EXTEND2(arg_, fn_, s_) s_(fn_(arg_, 1)) fn_(arg_, 2)
-#define EXTEND3(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) fn_(arg_, 3)
-#define EXTEND4(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) fn_(arg_, 4)
-#define EXTEND5(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) fn_(arg_, 5)
-#define EXTEND6(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) s_(fn_(arg_, 5)) fn_(arg_, 6)
-#define EXTEND7(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) s_(fn_(arg_, 5)) s_(fn_(arg_, 6)) fn_(arg_, 7)
-#define EXTEND8(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) s_(fn_(arg_, 5)) s_(fn_(arg_, 6)) s_(fn_(arg_, 7)) fn_(arg_, 8)
-#define EXTEND9(arg_, fn_, s_) s_(fn_(arg_, 1)) s_(fn_(arg_, 2)) s_(fn_(arg_, 3)) s_(fn_(arg_, 4)) s_(fn_(arg_, 5)) s_(fn_(arg_, 6)) s_(fn_(arg_, 7)) s_(fn_(arg_, 8)) fn_(arg_, 9)
 
-#define DEFINE(arg_) \
-    arg_(1) \
-    \
-    arg_(2) \
-    \
-    arg_(3) \
-    \
-    arg_(4) \
-    \
-    arg_(5) \
-    \
-    arg_(6) \
-    \
-    arg_(7) \
-    \
-    arg_(8) \
-    \
-    arg_(9)
+#define ANY_ARGUMENT(z, n, x) BOOST_PP_COMMA_IF(n) x##n
 
-#define COMMA(x) x,
-#define SEMICOLON(x) x;
+#define ANY_PARAMETER(z, n, x) BOOST_PP_COMMA_IF(n) ANY_ARG(x##n) _##x##n
 
-#define EXTEND(arg_, fn_, n_, D) EXTEND##n_(arg_, fn_, D)
+#define ANY_TYPENAME(z, n, x) BOOST_PP_COMMA_IF(n) typename x##n
 
-#define ARGUMENT(x, n) x##n
-
-#define PARAMETER(x, n) ANY_ARG(x##n) _##x##n
-
-#define TYPENAME(x, n) typename x##n
-
-#define TYPENAME_N(a_, n_)  EXTEND(a_, TYPENAME, n_, COMMA)
-#define PARAMETER_N(a_, n_) EXTEND(a_, PARAMETER, n_, COMMA)
-#define ARGUMENT_N(a_, n_) EXTEND(a_, ARGUMENT, n_, COMMA)
-
-#define MAKE_ANY(x) \
-    template<typename T, TYPENAME_N(T, x)> \
-    any make_any(PARAMETER_N(T, x)) FEATURE_NOEXCEPT \
+#define MAKE_ANY(z, n, _) \
+    template<typename T, BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_TYPENAME, T)> \
+    any make_any(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_PARAMETER, T)) FEATURE_NOEXCEPT \
     { \
-        return any(T(ARGUMENT_N(_T, x))); \
+        return any(T(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_ARGUMENT, _T))); \
     }
 
-#define ANY_EMPLACE(x) \
-    template<typename T, TYPENAME_N(T, x)> \
-    T& emplace(PARAMETER_N(T, x)) \
+#define ANY_EMPLACE(z, n, x) \
+    template<typename T, BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_TYPENAME, T)> \
+    T& emplace(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_PARAMETER, T)) \
     { \
         reset(); \
-        *this = T(ARGUMENT_N(_T, x)); \
+        *this = T(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_ARGUMENT, _T)); \
         return get_value<T>(); \
     }
+
 #endif // !ANY_HAS_CXX_11
 
 class bad_any_cast : public std::bad_cast
@@ -166,7 +133,7 @@ public:
         return get_value<T>();
     }
 #else
-    DEFINE(ANY_EMPLACE)
+    BOOST_PP_REPEAT(9, ANY_EMPLACE, _)
 #endif // ANY_HAS_CXX_11
 
         void reset() FEATURE_NOEXCEPT
@@ -316,5 +283,5 @@ any make_any(Args&& ...args) FEATURE_NOEXCEPT
     return any(T(std::forward<Args>(args)...));
 }
 #else
-DEFINE(MAKE_ANY)
+BOOST_PP_REPEAT(9, MAKE_ANY, _)
 #endif // ANY_HAS_CXX_11
