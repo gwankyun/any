@@ -26,19 +26,28 @@
 
 #if !ANY_HAS_CXX_11
 
+#ifndef ANY_ARGUMENT
 #define ANY_ARGUMENT(z, n, x) BOOST_PP_COMMA_IF(n) x##n
+#endif // !ANY_ARGUMENT
 
+#ifndef ANY_PARAMETER
 #define ANY_PARAMETER(z, n, x) BOOST_PP_COMMA_IF(n) ANY_ARG(x##n) _##x##n
+#endif // !ANY_PARAMETER
 
+#ifndef ANY_TYPENAME
 #define ANY_TYPENAME(z, n, x) BOOST_PP_COMMA_IF(n) typename x##n
+#endif // !ANY_TYPENAME
 
+#ifndef MAKE_ANY
 #define MAKE_ANY(z, n, _) \
     template<typename T, BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_TYPENAME, T)> \
     any make_any(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_PARAMETER, T)) FEATURE_NOEXCEPT \
     { \
         return any(T(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_ARGUMENT, _T))); \
     }
+#endif // !MAKE_ANY
 
+#ifndef ANY_EMPLACE
 #define ANY_EMPLACE(z, n, x) \
     template<typename T, BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_TYPENAME, T)> \
     T& emplace(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_PARAMETER, T)) \
@@ -47,6 +56,7 @@
         *this = T(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_ARGUMENT, _T)); \
         return get_value<T>(); \
     }
+#endif // !ANY_EMPLACE
 
 #endif // !ANY_HAS_CXX_11
 
