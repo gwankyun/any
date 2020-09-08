@@ -26,34 +26,38 @@
 
 #if !ANY_HAS_CXX_11
 
-#ifndef ANY_ARGUMENT
-#define ANY_ARGUMENT(z, n, x) BOOST_PP_COMMA_IF(n) x##n
-#endif // !ANY_ARGUMENT
+#ifndef ANY_TYPENAME
+#define ANY_TYPENAME(z, n, x) BOOST_PP_COMMA_IF(n) typename x##n
+#endif // !ANY_TYPENAME
 
 #ifndef ANY_PARAMETER
 #define ANY_PARAMETER(z, n, x) BOOST_PP_COMMA_IF(n) ANY_ARG(x##n) _##x##n
 #endif // !ANY_PARAMETER
 
-#ifndef ANY_TYPENAME
-#define ANY_TYPENAME(z, n, x) BOOST_PP_COMMA_IF(n) typename x##n
-#endif // !ANY_TYPENAME
+#ifndef ANY_ARGUMENT
+#define ANY_ARGUMENT(z, n, x) BOOST_PP_COMMA_IF(n) _##x##n
+#endif // !ANY_ARGUMENT
+
+#ifndef BOOST_PP_REPEAT_Z
+#define BOOST_PP_REPEAT_Z(z) BOOST_PP_REPEAT_##z
+#endif // !BOOST_PP_REPEAT_Z
 
 #ifndef MAKE_ANY
 #define MAKE_ANY(z, n, _) \
-    template<typename T, BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_TYPENAME, T)> \
-    any make_any(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_PARAMETER, T)) FEATURE_NOEXCEPT \
+    template<typename T, BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_TYPENAME, T)> /* , typename T0, typename T1 ... */ \
+    any make_any(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) FEATURE_NOEXCEPT /* , ANY_ARG(T0) _T0, ANY_ARG(T1) _T1 ... */ \
     { \
-        return any(T(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_ARGUMENT, _T))); \
+        return any(T(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_ARGUMENT, T))); /* , T0, T1 ... */ \
     }
 #endif // !MAKE_ANY
 
 #ifndef ANY_EMPLACE
 #define ANY_EMPLACE(z, n, x) \
-    template<typename T, BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_TYPENAME, T)> \
-    T& emplace(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_PARAMETER, T)) \
+    template<typename T, BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_TYPENAME, T)> /* , typename T0, typename T1 ... */ \
+    T& emplace(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) /* , ANY_ARG(T0) _T0, ANY_ARG(T1) _T1 ... */ \
     { \
         reset(); \
-        *this = T(BOOST_PP_REPEAT_##z(BOOST_PP_INC(n), ANY_ARGUMENT, _T)); \
+        *this = T(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_ARGUMENT, T)); /* , T0, T1 ... */ \
         return get_value<T>(); \
     }
 #endif // !ANY_EMPLACE
