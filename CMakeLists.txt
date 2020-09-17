@@ -17,10 +17,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(project any)
 project(${project})
 
-set(Any_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(Any_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(Any)
 if(Any_FOUND)
   cmake_print_variables(Any_INCLUDE_DIRS)
+else()
+    message(FATAL_ERROR "Looking for Any - not found")
 endif()
 
 add_compile_options(
@@ -30,5 +32,10 @@ add_executable(${project})
 target_sources(${project}
   PRIVATE
     src/main.cpp
-    include/any/any.hpp)
-target_include_directories(${project} PRIVATE ${Any_INCLUDE_DIRS})
+    include/any.hpp)
+
+# 引用庫
+target_link_libraries(${project}
+  PUBLIC
+    Any::Any
+)

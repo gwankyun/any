@@ -5,8 +5,8 @@
 #include <iostream>
 #include <string>
 #include <utility>
-#define ANY_HAS_CXX_11 0
-#include <any/any.hpp>
+//#define ANY_HAS_CXX_11 0
+#include <any.hpp>
 
 class Object
 {

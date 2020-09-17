@@ -3,10 +3,21 @@
 #include <typeinfo>
 #include <type_traits>
 #include <utility>
-#include "compiler_detection.h"
-#include <boost/preprocessor/comma_if.hpp>
-#include <boost/preprocessor/repeat.hpp>
-#include <boost/preprocessor/inc.hpp>
+#include "any/compiler_detection.hpp"
+
+#ifndef ANY_HAS_CXX_11
+#if defined(__cpp_variadic_templates)
+#define ANY_HAS_CXX_11 1
+#else
+#define ANY_HAS_CXX_11 0
+#endif // defined(__cpp_variadic_templates)
+#endif // ANY_HAS_CXX_11
+
+#if !ANY_HAS_CXX_11
+#include "any/boost/preprocessor/comma_if.hpp"
+#include "any/boost/preprocessor/repeat.hpp"
+#include "any/boost/preprocessor/inc.hpp"
+#endif // !ANY_HAS_CXX_11
 
 #ifndef ANY_ARG
 #if defined(__cpp_rvalue_references)
@@ -15,14 +26,6 @@
 #define ANY_ARG(T) const T&
 #endif // defined(__cpp_rvalue_references)
 #endif // !ANY_ARG
-
-#ifndef ANY_HAS_CXX_11
-#if defined(__cpp_rvalue_references)
-#define ANY_HAS_CXX_11 1
-#else
-#define ANY_HAS_CXX_11 0
-#endif // defined(__cpp_rvalue_references)
-#endif // ANY_HAS_CXX_11
 
 #if !ANY_HAS_CXX_11
 
@@ -52,7 +55,7 @@
 #endif // !MAKE_ANY
 
 #ifndef ANY_EMPLACE
-#define ANY_EMPLACE(z, n, x) \
+#define ANY_EMPLACE(z, n, _) \
     template<typename T, BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_TYPENAME, T)> /* , typename T0, typename T1 ... */ \
     T& emplace(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) /* , ANY_ARG(T0) _T0, ANY_ARG(T1) _T1 ... */ \
     { \
@@ -299,3 +302,4 @@ any make_any(Args&& ...args) FEATURE_NOEXCEPT
 #else
 BOOST_PP_REPEAT(9, MAKE_ANY, _)
 #endif // ANY_HAS_CXX_11
+
