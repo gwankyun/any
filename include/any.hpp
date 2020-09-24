@@ -34,11 +34,11 @@
 #endif // !ANY_TYPENAME
 
 #ifndef ANY_PARAMETER
-#define ANY_PARAMETER(z, n, x) BOOST_PP_COMMA_IF(n) ANY_ARG(x##n) _##x##n
+#define ANY_PARAMETER(z, n, x) BOOST_PP_COMMA_IF(n) ANY_ARG(x##n) x##n##_
 #endif // !ANY_PARAMETER
 
 #ifndef ANY_ARGUMENT
-#define ANY_ARGUMENT(z, n, x) BOOST_PP_COMMA_IF(n) _##x##n
+#define ANY_ARGUMENT(z, n, x) BOOST_PP_COMMA_IF(n) x##n##_
 #endif // !ANY_ARGUMENT
 
 #ifndef BOOST_PP_REPEAT_Z
@@ -48,19 +48,19 @@
 #ifndef MAKE_ANY
 #define MAKE_ANY(z, n, _) \
     template<typename T, BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_TYPENAME, T)> /* , typename T0, typename T1 ... */ \
-    any make_any(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) FEATURE_NOEXCEPT /* , ANY_ARG(T0) _T0, ANY_ARG(T1) _T1 ... */ \
+    any make_any(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) FEATURE_NOEXCEPT /* , ANY_ARG(T0) T0_, ANY_ARG(T1) T1_ ... */ \
     { \
-        return any(T(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_ARGUMENT, T))); /* , T0, T1 ... */ \
+        return any(T(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_ARGUMENT, T))); /* , T0_, T1_ ... */ \
     }
 #endif // !MAKE_ANY
 
 #ifndef ANY_EMPLACE
 #define ANY_EMPLACE(z, n, _) \
     template<typename T, BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_TYPENAME, T)> /* , typename T0, typename T1 ... */ \
-    T& emplace(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) /* , ANY_ARG(T0) _T0, ANY_ARG(T1) _T1 ... */ \
+    T& emplace(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) /* , ANY_ARG(T0) T0_, ANY_ARG(T1) T1_ ... */ \
     { \
         reset(); \
-        *this = T(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_ARGUMENT, T)); /* , T0, T1 ... */ \
+        *this = T(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_ARGUMENT, T)); /* , T0_, T1_ ... */ \
         return get_value<T>(); \
     }
 #endif // !ANY_EMPLACE
@@ -150,10 +150,10 @@ public:
         return get_value<T>();
     }
 #else
-    BOOST_PP_REPEAT(9, ANY_EMPLACE, _)
+    BOOST_PP_REPEAT(9, ANY_EMPLACE, _);
 #endif // ANY_HAS_CXX_11
 
-        void reset() FEATURE_NOEXCEPT
+    void reset() FEATURE_NOEXCEPT
     {
         if (has_value())
         {
@@ -300,6 +300,6 @@ any make_any(Args&& ...args) FEATURE_NOEXCEPT
     return any(T(std::forward<Args>(args)...));
 }
 #else
-BOOST_PP_REPEAT(9, MAKE_ANY, _)
+BOOST_PP_REPEAT(9, MAKE_ANY, _);
 #endif // ANY_HAS_CXX_11
 

@@ -1,29 +1,19 @@
 # any
-
 `std::any`的C++98實現，實現了大部分功能，無依賴。
 
 ## CMake引入
-
 ```CMake
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 include(CMakePrintHelpers)
 
-set(Any_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(Any_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(Any)
 if(Any_FOUND)
-  cmake_print_variables(Any_INCLUDE_DIRS)
-else()
-    message(FATAL_ERROR "Looking for Any - not found")
+    cmake_print_variables(Any_INCLUDE_DIRS)
 endif()
-
-target_link_libraries(${main}
-  PUBLIC
-    Any::Any
-)
 ```
 
 ## C++使用
-
 ```C++
 #include <any/any.hpp>
 
