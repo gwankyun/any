@@ -8,6 +8,8 @@
 #define ANY_HAS_CXX_11 0
 #include <any.hpp>
 
+using namespace lite;
+
 class Object
 {
 public:

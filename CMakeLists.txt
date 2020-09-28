@@ -37,5 +37,19 @@ target_sources(${project}
 # 引用庫
 target_link_libraries(${project}
   PUBLIC
-    Any::Any
-)
+    Any::Any)
+
+# 如果找到Catch2就添加測試
+find_package(Catch2 REQUIRED)
+cmake_print_variables(Catch2_FOUND)
+
+if(Catch2_FOUND)
+  set(test test)
+  add_executable(${test})
+  target_sources(${test}
+    PRIVATE src/test.cpp)
+  target_link_libraries(${test}
+    PUBLIC
+      Any::Any Catch2::Catch2)
+endif()
+
