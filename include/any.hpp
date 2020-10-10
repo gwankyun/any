@@ -26,6 +26,18 @@
 #endif // defined(__cpp_rvalue_references)
 #endif // !ANY_ARG
 
+#ifndef NOEXCEPT
+#define NOEXCEPT FEATURE_NOEXCEPT
+#endif // !NOEXCEPT
+
+#ifndef NULLPTR
+#define NULLPTR FEATURE_NULLPTR
+#endif // !NULLPTR
+
+#ifndef OVERRIDE
+#define OVERRIDE FEATURE_OVERRIDE
+#endif // !OVERRIDE
+
 #if !ANY_HAS_CXX_11
 
 #ifndef ANY_TYPENAME
@@ -47,7 +59,7 @@
 #ifndef MAKE_ANY
 #define MAKE_ANY(z, n, _) \
     template<typename T, BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_TYPENAME, T)> /* , typename T0, typename T1 ... */ \
-    any make_any(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) FEATURE_NOEXCEPT /* , ANY_ARG(T0) T0_, ANY_ARG(T1) T1_ ... */ \
+    any make_any(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_PARAMETER, T)) NOEXCEPT /* , ANY_ARG(T0) T0_, ANY_ARG(T1) T1_ ... */ \
     { \
         return any(T(BOOST_PP_REPEAT_Z(z)(BOOST_PP_INC(n), ANY_ARGUMENT, T))); /* , T0_, T1_ ... */ \
     }
@@ -71,7 +83,7 @@ namespace lite
     class bad_any_cast : public std::bad_cast
     {
     public:
-        bad_any_cast() FEATURE_NOEXCEPT
+        bad_any_cast() NOEXCEPT
         {
         }
 
@@ -79,7 +91,7 @@ namespace lite
         {
         }
 
-        char const* what() const FEATURE_NOEXCEPT
+        char const* what() const NOEXCEPT
         {
             return "bad_any_cast";
         }
@@ -92,16 +104,16 @@ namespace lite
     {
     public:
 
-        FEATURE_CONSTEXPR any() FEATURE_NOEXCEPT : base(NULL)
+        FEATURE_CONSTEXPR any() NOEXCEPT : base(NULLPTR)
         {
         }
 
-        any(const any& other) : base(other.has_value() ? other.base->clone() : NULL)
+        any(const any& other) : base(other.has_value() ? other.base->clone() : NULLPTR)
         {
         }
 
 #if ANY_HAS_CXX_11
-        any(any&& other) FEATURE_NOEXCEPT : base(NULL)
+        any(any&& other) NOEXCEPT : base(NULLPTR)
         {
             swap(other);
         }
@@ -154,16 +166,16 @@ namespace lite
         BOOST_PP_REPEAT(9, ANY_EMPLACE, _);
 #endif // ANY_HAS_CXX_11
 
-        void reset() FEATURE_NOEXCEPT
+        void reset() NOEXCEPT
         {
             if (has_value())
             {
                 delete base;
-                base = NULL;
+                base = NULLPTR;
             }
         }
 
-        void swap(any& other) FEATURE_NOEXCEPT
+        void swap(any& other) NOEXCEPT
         {
             Base* temp = base;
             base = other.base;
@@ -172,12 +184,12 @@ namespace lite
 
         // 觀察器
 
-        bool has_value() const FEATURE_NOEXCEPT
+        bool has_value() const NOEXCEPT
         {
-            return base != NULL;
+            return base != NULLPTR;
         }
 
-        const std::type_info& type() const FEATURE_NOEXCEPT
+        const std::type_info& type() const NOEXCEPT
         {
             if (has_value())
             {
@@ -190,13 +202,13 @@ namespace lite
         }
 
         template<typename T>
-        friend T* any_cast(any* operand) FEATURE_NOEXCEPT;
+        friend T* any_cast(any* operand) NOEXCEPT;
 
     private:
         class Base
         {
         public:
-            Base() FEATURE_NOEXCEPT
+            Base() NOEXCEPT
             {
             }
 
@@ -204,7 +216,7 @@ namespace lite
             {
             }
 
-            virtual const std::type_info& type() const FEATURE_NOEXCEPT = 0;
+            virtual const std::type_info& type() const NOEXCEPT = 0;
 
             virtual Base* clone() = 0;
 
@@ -224,12 +236,12 @@ namespace lite
             {
             }
 
-            const std::type_info& type() const FEATURE_NOEXCEPT FEATURE_OVERRIDE
+            const std::type_info& type() const NOEXCEPT OVERRIDE
             {
                 return typeid(value);
             }
 
-            Base* clone() FEATURE_OVERRIDE
+            Base* clone() OVERRIDE
             {
                 return new Derived<T>(value);
             }
@@ -250,21 +262,21 @@ namespace lite
     };
 
     template<typename T>
-    T* any_cast(any* operand) FEATURE_NOEXCEPT
+    T* any_cast(any* operand) NOEXCEPT
     {
         any::Derived<T>* d = dynamic_cast<any::Derived<T>*>(operand->base);
-        if (d != NULL)
+        if (d != NULLPTR)
         {
             return &(d->value);
         }
         else
         {
-            return NULL;
+            return NULLPTR;
         }
     }
 
     template<typename T>
-    const T* any_cast(const any* operand) FEATURE_NOEXCEPT
+    const T* any_cast(const any* operand) NOEXCEPT
     {
         return any_cast<T>(const_cast<any*>(operand));
     }
@@ -273,7 +285,7 @@ namespace lite
     T any_cast(any& operand)
     {
         T* d = any_cast<T>(&operand);
-        if (d != NULL)
+        if (d != NULLPTR)
         {
             return *d;
         }
@@ -289,14 +301,14 @@ namespace lite
         return any_cast<T>(const_cast<any&>(operand));
     }
 
-    inline void swap(any& lhs, any& rhs) FEATURE_NOEXCEPT
+    inline void swap(any& lhs, any& rhs) NOEXCEPT
     {
         lhs.swap(rhs);
     }
 
 #if ANY_HAS_CXX_11
     template<typename T, typename ...Args>
-    any make_any(Args&& ...args) FEATURE_NOEXCEPT
+    any make_any(Args&& ...args) NOEXCEPT
     {
         return any(T(std::forward<Args>(args)...));
     }
