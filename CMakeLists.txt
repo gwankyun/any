@@ -18,15 +18,10 @@ set(project any)
 project(${project})
 
 set(Any_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-find_package(Any)
-if(Any_FOUND)
-  cmake_print_variables(Any_INCLUDE_DIRS)
-else()
-    message(FATAL_ERROR "Looking for Any - not found")
-endif()
+find_package(Any REQUIRED)
 
 add_compile_options(
-  "$<$<CXX_COMPILER_ID:MSVC>:/W4;/MP>")
+  "$<$<CXX_COMPILER_ID:MSVC>:/W4;/MP;/Zc:__cplusplus;>")
 
 add_executable(${project})
 target_sources(${project}
@@ -39,8 +34,10 @@ target_link_libraries(${project}
   PUBLIC
     Any::Any)
 
+target_compile_features(${project} PRIVATE cxx_std_17)
+
 # 如果找到Catch2就添加測試
-find_package(Catch2 REQUIRED)
+find_package(Catch2 CONFIG)
 cmake_print_variables(Catch2_FOUND)
 
 if(Catch2_FOUND)
@@ -51,5 +48,6 @@ if(Catch2_FOUND)
   target_link_libraries(${test}
     PUBLIC
       Any::Any Catch2::Catch2)
+  target_compile_features(${test} PRIVATE cxx_std_17)
 endif()
 

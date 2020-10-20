@@ -1,7 +1,10 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#define ANY_HAS_CXX_11 0
+//#define ANY_HAS_CXX_11 0
+//#define ANY_HAS_CXX_14 0
+//#define ANY_HAS_CXX_17 0
 #include <any.hpp>
+#include <initializer_list>
 
 using namespace lite;
 
@@ -93,6 +96,14 @@ public:
         data += t9;
     }
 
+    Object(std::initializer_list<int> il)
+    {
+        for (auto&& i : il)
+        {
+            data += i;
+        }
+    }
+
     ~Object()
     {
     }
@@ -104,6 +115,7 @@ private:
 
 TEST_CASE("any_cast and make_any", "[make_any]")
 {
+    REQUIRE(any_cast<Object>(make_any<Object>()).data == 0);
     REQUIRE(any_cast<Object>(make_any<Object>(1)).data == 1);
     REQUIRE(any_cast<Object>(make_any<Object>(1, 1)).data == 2);
     REQUIRE(any_cast<Object>(make_any<Object>(1, 1, 1)).data == 3);
@@ -115,9 +127,43 @@ TEST_CASE("any_cast and make_any", "[make_any]")
     REQUIRE(any_cast<Object>(make_any<Object>(1, 1, 1, 1, 1, 1, 1, 1, 1)).data == 9);
 }
 
+TEST_CASE("any_cast and any::any in_place_type", "[any::any]")
+{
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object))).data == 0);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1)).data == 1);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1, 1)).data == 2);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1, 1, 1)).data == 3);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1, 1, 1, 1)).data == 4);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1, 1, 1, 1, 1)).data == 5);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1, 1, 1, 1, 1, 1)).data == 6);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1, 1, 1, 1, 1, 1, 1)).data == 7);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1, 1, 1, 1, 1, 1, 1, 1)).data == 8);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), 1, 1, 1, 1, 1, 1, 1, 1, 1)).data == 9);
+}
+
+#if ANY_HAS_CXX_11
+TEST_CASE("any_cast and any::any in_place_type initializer_list", "[any::any]")
+{
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1 })).data == 1);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1, 1 })).data == 2);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1, 1, 1 })).data == 3);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1, 1, 1, 1 })).data == 4);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1, 1, 1, 1, 1 })).data == 5);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1, 1, 1, 1, 1, 1 })).data == 6);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1, 1, 1, 1, 1, 1, 1 })).data == 7);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1, 1, 1, 1, 1, 1, 1, 1 })).data == 8);
+    REQUIRE(any_cast<Object>(any(IN_PLACE_TYPE(Object), { 1, 1, 1, 1, 1, 1, 1, 1, 1 })).data == 9);
+}
+#endif // ANY_HAS_CXX_11
+
 TEST_CASE("any_cast and emplace", "[emplace]")
 {
     any a = make_any<Object>(0);
+    SECTION("emplace 0")
+    {
+        a.emplace<Object>();
+        REQUIRE(any_cast<Object>(a).data == 0);
+    }
     SECTION("emplace 1")
     {
         a.emplace<Object>(1);
