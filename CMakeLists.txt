@@ -1,5 +1,5 @@
 ﻿# cmake最低版本
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.24)
 
 # 啟用IDE目錄功能
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -27,6 +27,7 @@ add_executable(${project})
 target_sources(${project}
   PRIVATE
     src/main.cpp
+    include/any/marco.hpp
     include/any.hpp)
 
 # 引用庫
@@ -37,7 +38,7 @@ target_link_libraries(${project}
 target_compile_features(${project} PRIVATE cxx_std_17)
 
 # 如果找到Catch2就添加測試
-find_package(Catch2 CONFIG)
+find_package(Catch2 3 CONFIG)
 cmake_print_variables(Catch2_FOUND)
 
 if(Catch2_FOUND)
@@ -48,6 +49,6 @@ if(Catch2_FOUND)
   target_link_libraries(${test}
     PUBLIC
       Any::Any Catch2::Catch2)
-  target_compile_features(${test} PRIVATE cxx_std_17)
+  target_compile_features(${test} PRIVATE cxx_std_20)
 endif()
 

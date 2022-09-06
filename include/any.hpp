@@ -50,7 +50,7 @@ namespace lite
         }
 
         any(const any& other) // 2
-            : base(other.has_value() ? other.base->clone() : NULLPTR)
+            : base(other.clone())
         {
         }
 
@@ -100,7 +100,7 @@ namespace lite
             if (this != &other)
             {
                 reset();
-                base = other.base->clone();
+                base = other.clone();
             }
             return *this;
         }
@@ -256,6 +256,15 @@ namespace lite
         T& get_value()
         {
             return dynamic_cast<Derived<T>*>(base)->value;
+        }
+
+        Base* clone() const
+        {
+            if (base == NULLPTR)
+            {
+                return NULLPTR;
+            }
+            return base->clone();
         }
 
         Base* base;

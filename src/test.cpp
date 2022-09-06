@@ -1,5 +1,5 @@
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <catch2/../catch2/catch_session.hpp>
+#include <catch2/catch_test_macros.hpp>
 //#define ANY_HAS_CXX_11 0
 //#define ANY_HAS_CXX_14 0
 //#define ANY_HAS_CXX_17 0
@@ -7,6 +7,12 @@
 #include <initializer_list>
 
 using namespace lite;
+
+int main(int argc, char* argv[])
+{
+    auto result = Catch::Session().run(argc, argv);
+    return result;
+}
 
 class Object
 {
